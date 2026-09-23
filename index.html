@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>API Mercado Livre</title>
+  <title>Gerador de Token - Mercado Livre</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
       margin: 0;
       background-color: #111;
       color: #fff;
@@ -19,26 +19,89 @@
       background: #222;
       padding: 2rem;
       border-radius: 10px;
-      text-align: center;
+      max-width: 500px;
+      width: 100%;
       border: 1px solid #333;
+      box-sizing: border-box;
     }
-    .status {
-      color: #00e676;
-      font-weight: bold;
-    }
-    code {
+    h2 { margin-top: 0; color: #ffe800; }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid #444;
       background: #333;
-      padding: 4px 8px;
-      border-radius: 4px;
-      color: #ffe800;
+      color: #fff;
+      box-sizing: border-box;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #00e676;
+      border: none;
+      font-weight: bold;
+      color: #000;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover { background: #00c853; }
+    pre {
+      background: #000;
+      padding: 10px;
+      border-radius: 5px;
+      overflow-x: auto;
+      max-height: 250px;
+      font-size: 12px;
+      color: #00e676;
+      white-space: pre-wrap;
+      word-break: break-all;
     }
   </style>
 </head>
 <body>
   <div class="card">
-    <h1>API Mercado Livre</h1>
-    <p>Status: <span class="status">Online & Ativa</span></p>
-    <p>Endpoint do Token: <code>/api/token</code></p>
+    <h2>Painel do Token</h2>
+    <label for="refreshToken">Cole o Code / Refresh Token:</label>
+    <input type="text" id="refreshToken" placeholder="TG-xxxxxx...">
+    <button onclick="gerarToken()">Gerar Access Token</button>
+
+    <h3>Resposta:</h3>
+    <pre id="resultado">Aguardando envio...</pre>
   </div>
+
+  <script>
+    // Preenche automaticamente se o ?code= estiver na URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const codeParam = urlParams.get('code');
+    if (codeParam) {
+      document.getElementById('refreshToken').value = codeParam;
+    }
+
+    async function gerarToken() {
+      const tokenInput = document.getElementById('refreshToken').value;
+      const resContainer = document.getElementById('resultado');
+
+      if (!tokenInput) {
+        alert('Por favor, insira o token!');
+        return;
+      }
+
+      resContainer.innerText = 'A processar...';
+
+      try {
+        const response = await fetch('/api/token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refresh_token: tokenInput })
+        });
+
+        const data = await response.json();
+        resContainer.innerText = JSON.stringify(data, null, 2);
+      } catch (err) {
+        resContainer.innerText = 'Erro na requisição: ' + err.message;
+      }
+    }
+  </script>
 </body>
 </html>
