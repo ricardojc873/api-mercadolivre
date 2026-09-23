@@ -35,6 +35,20 @@
       color: #fff;
       box-sizing: border-box;
     }
+    .btn-auth {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background: #ffe800;
+      color: #000;
+      text-align: center;
+      text-decoration: none;
+      font-weight: bold;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      box-sizing: border-box;
+    }
+    .btn-auth:hover { background: #e6d000; }
     button {
       width: 100%;
       padding: 10px;
@@ -62,9 +76,15 @@
 <body>
   <div class="card">
     <h2>Painel do Token</h2>
+
+    <!-- Botão para garantir que a autorização gera o ID correto -->
+    <a class="btn-auth" href="https://auth.mercadolivre.com.br/authorization?response_type=code&client_id=5408499095968669&redirect_uri=https://api-mercadolivre-nu.vercel.app">
+      1. Autorizar Conta no Mercado Livre
+    </a>
+
     <label for="refreshToken">Cole o Code / Refresh Token:</label>
     <input type="text" id="refreshToken" placeholder="TG-xxxxxx...">
-    <button onclick="gerarToken()">Gerar Access Token</button>
+    <button onclick="gerarToken()">2. Gerar Access Token</button>
 
     <h3>Resposta:</h3>
     <pre id="resultado">Aguardando envio...</pre>
