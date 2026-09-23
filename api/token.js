@@ -9,22 +9,33 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Token ou código não fornecido' });
   }
 
+  // Remove espaços acidentais no código recebido
+  const cleanToken = refresh_token.trim();
+
   // Identifica se é um código de autorização inicial (TG-...) ou um Refresh Token
-  const isCode = refresh_token.startsWith('TG-');
+  const isCode = cleanToken.startsWith('TG-');
   const grantType = isCode ? 'authorization_code' : 'refresh_token';
+
+  // Força o ID novo caso a variável de ambiente não esteja atualizada na Vercel
+  const clientId = (process.env.MELI_CLIENT_ID || '5408499095968669').trim();
+  const clientSecret = process.env.MELI_CLIENT_SECRET ? process.env.MELI_CLIENT_SECRET.trim() : '';
+
+  if (!clientSecret) {
+    return res.status(500).json({ error: 'MELI_CLIENT_SECRET não foi configurada na Vercel.' });
+  }
 
   // Parâmetros necessários para a API do Mercado Livre
   const params = new URLSearchParams({
-    client_id: process.env.MELI_CLIENT_ID,
-    client_secret: process.env.MELI_CLIENT_SECRET,
+    client_id: clientId,
+    client_secret: clientSecret,
     grant_type: grantType,
     redirect_uri: 'https://api-mercadolivre-nu.vercel.app'
   });
 
   if (isCode) {
-    params.append('code', refresh_token);
+    params.append('code', cleanToken);
   } else {
-    params.append('refresh_token', refresh_token);
+    params.append('refresh_token', cleanToken);
   }
 
   try {
